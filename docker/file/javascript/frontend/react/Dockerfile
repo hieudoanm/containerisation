@@ -1,5 +1,5 @@
 # Stage 1: Build the React app
-FROM node:22.16.0 AS build
+FROM node:22.16.1 AS build
 
 # Set the working directory in the container
 WORKDIR /app
