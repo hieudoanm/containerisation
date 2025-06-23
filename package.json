@@ -1,0 +1,36 @@
+{
+  "name": "containerisation",
+  "version": "0.0.1",
+  "description": "Containerisation - Docker & Kubernetes",
+  "keywords": [
+    "docker",
+    "kubernetes",
+    "containerisation",
+    "devops",
+    "infrastructure"
+  ],
+  "homepage": "https://github.com/hieudoanm/containerisation#readme",
+  "bugs": {
+    "url": "https://github.com/hieudoanm/containerisation/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/hieudoanm/containerisation.git"
+  },
+  "license": "GPL-3.0",
+  "author": "hieudoanm <hieumdoan@gmail.com> (https://hieudoanm.github.io)",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "prebuild": "rimraf docs",
+    "build": "docsify init docs",
+    "prepare": "husky || true"
+  },
+  "packageManager": "pnpm@10.12.2",
+  "devDependencies": {
+    "docsify-cli": "4.4.4",
+    "husky": "9.1.7",
+    "rimraf": "6.0.1"
+  }
+}
