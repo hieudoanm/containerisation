@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.13.5
+FROM python:3.13.6
 
 # Assign environments
 ENV PORT='8080'
