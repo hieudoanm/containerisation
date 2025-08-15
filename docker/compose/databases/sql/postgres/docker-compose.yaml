@@ -5,7 +5,7 @@ volumes:
 services:
   postgres:
     restart: unless-stopped
-    image: postgres:17.5
+    image: postgres:17.6
     hostname: postgres
     container_name: postgres
     ports:
