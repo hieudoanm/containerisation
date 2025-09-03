@@ -1,6 +1,6 @@
 services:
   cockroachdb:
-    image: cockroachdb/cockroach:v25.3.0
+    image: cockroachdb/cockroach:v25.3.1
     hostname: cockroachdb
     container_name: cockroachdb
     ports:
