@@ -10,7 +10,7 @@ services:
       - '2181:2181'
 
   kafka:
-    image: confluentinc/cp-kafka:8.0.0
+    image: confluentinc/cp-kafka:8.0.1
     hostname: kafka
     container_name: kafka
     depends_on:
