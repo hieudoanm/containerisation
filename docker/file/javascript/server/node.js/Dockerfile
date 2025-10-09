@@ -1,4 +1,4 @@
-FROM node:24.9.0 AS build
+FROM node:24.10.0 AS build
 
 LABEL author hieudoanm
 
@@ -9,7 +9,7 @@ COPY . /home/node/app
 
 RUN pnpm install & pnpm build
 
-FROM node:24.9.0-alpine
+FROM node:24.10.0-alpine
 
 # Update system packages to reduce vulnerabilities
 RUN apk update && apk upgrade
