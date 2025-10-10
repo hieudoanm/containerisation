@@ -27,7 +27,7 @@
     "build": "docsify init docs",
     "prepare": "husky || true"
   },
-  "packageManager": "pnpm@10.18.1",
+  "packageManager": "pnpm@10.18.2",
   "devDependencies": {
     "docsify-cli": "4.4.4",
     "husky": "9.1.7",
