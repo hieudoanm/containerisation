@@ -3,7 +3,7 @@
 # ====================================
 
 # Use a pinned version of Bun for reproducibility
-FROM oven/bun:1.2.23 AS builder
+FROM oven/bun:1.3.0 AS builder
 
 # Set work directory
 WORKDIR /app
