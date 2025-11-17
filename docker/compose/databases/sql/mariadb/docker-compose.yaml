@@ -1,6 +1,6 @@
 services:
   mariadb:
-    image: mariadb:11.1 # Pin to a stable version
+    image: mariadb:11.8 # Pin to a stable version
     container_name: mariadb
     hostname: mariadb
     restart: unless-stopped
