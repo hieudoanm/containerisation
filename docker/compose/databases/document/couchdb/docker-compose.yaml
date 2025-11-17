@@ -1,6 +1,6 @@
 services:
   couchdb:
-    image: couchdb:3.3 # Specify a stable version for reproducibility
+    image: couchdb:3.5 # Specify a stable version for reproducibility
     container_name: couchdb
     hostname: couchdb
     restart: unless-stopped
