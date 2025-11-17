@@ -1,18 +1,35 @@
+services:
+  postgres:
+    image: postgres:18.1 # Pin to a stable version
+    container_name: postgres
+    hostname: postgres
+    restart: unless-stopped
+    networks:
+      - backend # Internal network for multi-service setup
+    ports:
+      - "5432:5432" # Only expose if needed externally
+    environment:
+      POSTGRES_USER: appuser # Non-default username
+      POSTGRES_PASSWORD: StrongPassword123! # Strong password for production
+      POSTGRES_DB: mydatabase # Default database
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   postgresql_data:
     driver: local
 
-services:
-  postgres:
-    restart: unless-stopped
-    image: postgres:18.1
-    hostname: postgres
-    container_name: postgres
-    ports:
-      - 5432:5432
-    volumes:
-      - postgresql_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_USER=username
-      - POSTGRES_DB=postgres
+networks:
+  backend:
+    driver: bridge

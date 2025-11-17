@@ -1,13 +1,34 @@
 services:
   mongodb:
-    image: mongo:8
+    image: mongo:8.0
+    container_name: mongodb
     hostname: mongo
-    container_name: mongo
-    restart: always
+    restart: unless-stopped
+    networks:
+      - backend
     ports:
-      - '27017:27017'
+      - "27017:27017" # Only expose if needed externally
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: StrongPassword123! # Use a strong password in production
     volumes:
-      - mongodbdata:/data/db
+      - mongodb_data:/data/db
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
-  mongodbdata:
+  mongodb_data:
+    driver: local
+
+networks:
+  backend:
+    driver: bridge

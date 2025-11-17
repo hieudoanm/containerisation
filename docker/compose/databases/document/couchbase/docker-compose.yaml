@@ -1,26 +1,44 @@
-version: '3.9'
-
 services:
   couchbase:
     image: couchbase:community
-    hostname: couchbase
     container_name: couchbase
+    hostname: couchbase
+    restart: unless-stopped
+    networks:
+      - backend
     ports:
-      - '8091:8091' # Admin UI
-      - '8092:8092' # Query UI
-      - '8093:8093' # Query service
-      - '8094:8094' # Search service
-      - '11210:11210' # Data service
+      - "8091:8091" # Admin UI
+      - "8092:8092" # Views / Query UI
+      - "8093:8093" # Query service
+      - "8094:8094" # Full Text Search service
+      - "11210:11210" # Data service
     environment:
-      - COUCHBASE_ADMIN_USERNAME=admin # Admin username
-      - COUCHBASE_ADMIN_PASSWORD=password # Admin password
-      - COUCHBASE_BUCKET=my_bucket # Default bucket name
-      - COUCHBASE_BUCKET_RAMSIZE=256 # RAM quota for the bucket (in MB)
-      - COUCHBASE_SERVICES=data,index,query,fts # Enable specific services
+      COUCHBASE_ADMIN_USERNAME: admin
+      COUCHBASE_ADMIN_PASSWORD: StrongPassword123! # Use a stronger password
+      COUCHBASE_BUCKET: my_bucket
+      COUCHBASE_BUCKET_RAMSIZE: 256 # RAM quota in MB
+      COUCHBASE_SERVICES: data,index,query,fts
     volumes:
       - couchbase_data:/opt/couchbase/var
       - couchbase_config:/opt/couchbase/etc
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   couchbase_data:
+    driver: local
   couchbase_config:
+    driver: local
+
+networks:
+  backend:
+    driver: bridge

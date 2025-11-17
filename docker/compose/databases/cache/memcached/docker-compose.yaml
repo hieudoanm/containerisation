@@ -1,10 +1,28 @@
 services:
   memcached:
-    image: memcached:latest
-    hostname: memcached
+    image: memcached:1.6.39
     container_name: memcached
+    hostname: memcached
+    restart: unless-stopped
+    networks:
+      - backend
     ports:
-      - '11211:11211' # Default Memcached port
+      - "11211:11211" # expose to host if needed
     environment:
-      - MEMCACHED_MEMORY=64 # Memory allocated to Memcached (in MB)
-    command: memcached -m 64 -u memcache
+      MEMCACHED_MEMORY: 128 # increase memory allocation if needed
+    command: memcached -m 128 -u memcache -v
+    deploy:
+      resources:
+        limits:
+          memory: 256M # Docker resource limit
+        reservations:
+          memory: 128M # Minimum guaranteed memory
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  backend:
+    driver: bridge

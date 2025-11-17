@@ -3,13 +3,37 @@ services:
     image: redis:8.2.3
     hostname: redis
     container_name: redis
-    restart: always
+    restart: unless-stopped
+    networks:
+      - backend
     ports:
-      - '6379:6379'
-    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+      - "6379:6379" # Only expose if needed externally
+    command: >
+      redis-server
+      --save 20 1
+      --loglevel warning
+      --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+      --appendonly yes
+      --appendfilename "appendonly.aof"
+      --dir /data
     volumes:
-      - redis:/data
+      - redis_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
-  redis:
+  redis_data:
     driver: local
+
+networks:
+  backend:
+    driver: bridge
