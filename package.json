@@ -1,0 +1,30 @@
+{
+  "name": "@doi/apps",
+  "version": "0.0.1",
+  "description": "doi apps",
+  "keywords": [
+    "doi",
+    "cli"
+  ],
+  "homepage": "https://github.com/hieudoanm/doi#readme",
+  "bugs": {
+    "url": "https://github.com/hieudoanm/doi/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/hieudoanm/doi.git"
+  },
+  "license": "GPL-3.0",
+  "author": "hieudoanm <hieumdoan@gmail.com> (https://hieudoanm.github.io)",
+  "scripts": {
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "build": "turbo run build",
+    "prepare": "husky || true"
+  },
+  "packageManager": "pnpm@10.22.0",
+  "devDependencies": {
+    "husky": "9.1.7",
+    "turbo": "2.6.1"
+  }
+}
