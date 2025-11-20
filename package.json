@@ -17,9 +17,10 @@
   "license": "GPL-3.0",
   "author": "hieudoanm <hieumdoan@gmail.com> (https://hieudoanm.github.io)",
   "scripts": {
+    "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "turbo run format",
     "build": "turbo run build",
+    "format": "turbo run format",
     "prepare": "husky || true"
   },
   "packageManager": "pnpm@10.22.0",

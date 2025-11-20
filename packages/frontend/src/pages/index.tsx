@@ -3,10 +3,17 @@ import { Divider } from '@doi/components/Divider';
 import { Navbar } from '@doi/components/Navbar';
 import { tryCatch } from '@doi/utils/try-catch';
 import { NextPage } from 'next';
-import { ChangeEvent, FC, FormEvent, useState } from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  FC,
+  FormEvent,
+  SetStateAction,
+  useState,
+} from 'react';
 
-const APA: FC<{ reference: Reference }> = ({ reference }) => {
-  const authorsAPA = reference.authors
+const References: FC<{ reference: Reference }> = ({ reference }) => {
+  const authors = reference.authors
     .map((a) => `${a.family}, ${a.given.charAt(0)}.`)
     .join(', ')
     .replace(/, ([^,]*)$/, ', & $1');
@@ -15,7 +22,7 @@ const APA: FC<{ reference: Reference }> = ({ reference }) => {
 
   return (
     <span>
-      {authorsAPA} ({reference.year}). {reference.title}.{' '}
+      {authors} ({reference.year}). {reference.title}.{' '}
       <i>{reference.journal}</i>. {journalPart}.{' '}
       <a href={reference.url} target="_blank" rel="noopener noreferrer">
         {reference.url}
@@ -24,25 +31,109 @@ const APA: FC<{ reference: Reference }> = ({ reference }) => {
   );
 };
 
+const Table: FC<{
+  references: Reference[];
+  setState: Dispatch<
+    SetStateAction<{
+      tab: 'references' | 'table';
+      loading: boolean;
+      doi: string;
+      references: Reference[];
+    }>
+  >;
+}> = ({ references = [], setState }) => {
+  return (
+    <table className="min-w-full text-sm text-white">
+      <thead className="bg-white/10 backdrop-blur-md">
+        <tr>
+          <th className="px-4 py-2 text-left">Authors</th>
+          <th className="px-4 py-2 text-left">Year</th>
+          <th className="px-4 py-2 text-left">Title</th>
+          <th className="px-4 py-2 text-left">Journal</th>
+          <th className="px-4 py-2 text-left">Volume - Issue - Pages</th>
+          <th className="px-4 py-2 text-left">Link</th>
+          <th className="px-4 py-2 text-left">
+            <button
+              type="button"
+              className="cursor-pointer text-red-400 hover:underline"
+              onClick={() => {
+                setState((previous) => ({
+                  ...previous,
+                  references: [],
+                }));
+              }}>
+              Delete
+            </button>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {references.map((ref, index) => (
+          <tr
+            key={ref.issue}
+            className="border-t border-white/20 hover:bg-white/5">
+            <td className="px-4 py-2">
+              {ref.authors.map((a) => `${a.family} ${a.given}`).join(', ')}
+            </td>
+            <td className="px-4 py-2">{ref.year}</td>
+            <td className="px-4 py-2">{ref.title}</td>
+            <td className="px-4 py-2">{ref.journal}</td>
+            <td className="px-4 py-2">{`${ref.volume}(${ref.issue}), ${ref.pages}`}</td>
+            <td className="px-4 py-2">
+              <a
+                href={ref.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cursor-pointer text-blue-400 hover:underline">
+                View
+              </a>
+            </td>
+            <td className="px-4 py-2">
+              <button
+                type="button"
+                className="cursor-pointer text-red-400 hover:underline"
+                onClick={() => {
+                  setState((previous) => {
+                    const { references = [] } = previous;
+                    const updatedReferences = references.filter(
+                      (_, i) => i !== index,
+                    );
+                    return {
+                      ...previous,
+                      references: updatedReferences,
+                    };
+                  });
+                }}>
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
 const HomePage: NextPage = () => {
   const [
     {
+      tab = 'references',
       loading = false,
       doi = 'https://doi.org/10.1016/j.smrv.2009.04.001',
       references = [],
     },
     setState,
   ] = useState<{
+    tab: 'references' | 'table';
     loading: boolean;
     doi: string;
     references: Reference[];
   }>({
+    tab: 'references',
     loading: false,
     doi: 'https://doi.org/10.1016/j.smrv.2009.04.001',
     references: [],
   });
-
-  const [activeTab, setActiveTab] = useState<'table' | 'apa'>('table');
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -70,7 +161,7 @@ const HomePage: NextPage = () => {
       return;
     }
     setState((previous) => {
-      const { references } = previous;
+      const { references = [] } = previous;
       if (references.findIndex(({ id }) => reference.id === id) < 0) {
         references.push(reference);
         references.sort((a, b) => {
@@ -82,6 +173,8 @@ const HomePage: NextPage = () => {
       return { ...previous, loading: false, references };
     });
   };
+
+  console.info('references', references);
 
   return (
     <div className="min-h-screen w-screen">
@@ -112,111 +205,47 @@ const HomePage: NextPage = () => {
 
         {/* Tabs */}
         {references.length > 0 && (
-          <div className="flex gap-x-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-8">
             <button
               type="button"
               className="btn btn-primary w-full"
-              onClick={() => setActiveTab('table')}>
-              Table
+              onClick={() =>
+                setState((previous) => ({ ...previous, tab: 'references' }))
+              }>
+              References
             </button>
             <button
               type="button"
               className="btn btn-primary w-full"
-              onClick={() => setActiveTab('apa')}>
-              APA
+              onClick={() =>
+                setState((previous) => ({ ...previous, tab: 'table' }))
+              }>
+              Table
             </button>
           </div>
         )}
 
         {/* Content */}
-        {activeTab === 'table' && references.length > 0 && (
-          <div className="overflow-x-auto rounded-lg border border-white/20">
-            <table className="min-w-full text-sm text-white">
-              <thead className="bg-white/10 backdrop-blur-md">
-                <tr>
-                  <th className="px-4 py-2 text-left">Authors</th>
-                  <th className="px-4 py-2 text-left">Year</th>
-                  <th className="px-4 py-2 text-left">Title</th>
-                  <th className="px-4 py-2 text-left">Journal</th>
-                  <th className="px-4 py-2 text-left">
-                    Volume - Issue - Pages
-                  </th>
-                  <th className="px-4 py-2 text-left">Link</th>
-                  <th className="px-4 py-2 text-left">
-                    <button
-                      type="button"
-                      className="cursor-pointer text-red-400 hover:underline"
-                      onClick={() => {
-                        setState((previous) => ({
-                          ...previous,
-                          references: [],
-                        }));
-                      }}>
-                      Delete
-                    </button>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {references.map((ref, index) => (
-                  <tr
-                    key={ref.issue}
-                    className="border-t border-white/20 hover:bg-white/5">
-                    <td className="px-4 py-2">
-                      {ref.authors
-                        .map((a) => `${a.family} ${a.given}`)
-                        .join(', ')}
-                    </td>
-                    <td className="px-4 py-2">{ref.year}</td>
-                    <td className="px-4 py-2">{ref.title}</td>
-                    <td className="px-4 py-2">{ref.journal}</td>
-                    <td className="px-4 py-2">{`${ref.volume}(${ref.issue}), ${ref.pages}`}</td>
-                    <td className="px-4 py-2">
-                      <a
-                        href={ref.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="cursor-pointer text-blue-400 hover:underline">
-                        View
-                      </a>
-                    </td>
-                    <td className="px-4 py-2">
-                      <button
-                        type="button"
-                        className="cursor-pointer text-red-400 hover:underline"
-                        onClick={() => {
-                          setState((previous) => {
-                            const { references = [] } = previous;
-                            const updatedReferences = references.filter(
-                              (_, i) => i !== index,
-                            );
-                            return {
-                              ...previous,
-                              references: updatedReferences,
-                            };
-                          });
-                        }}>
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
+        {references.length > 0 && (
+          <>
+            {tab === 'references' && (
+              <div className="flex flex-col gap-y-4">
+                <h2 className="text-center text-lg font-semibold text-white">
+                  References
+                </h2>
+                {references.map((ref) => (
+                  <p key={ref.url} className="text-white">
+                    <References reference={ref} />
+                  </p>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {activeTab === 'apa' && references.length > 0 && (
-          <div className="flex flex-col gap-y-4">
-            <h2 className="text-center text-lg font-semibold text-white">
-              References
-            </h2>
-            {references.map((ref) => (
-              <p key={ref.url} className="text-white">
-                <APA reference={ref} />
-              </p>
-            ))}
-          </div>
+              </div>
+            )}
+            {tab === 'table' && (
+              <div className="overflow-x-auto rounded-lg border border-white/20">
+                <Table references={references} setState={setState} />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
