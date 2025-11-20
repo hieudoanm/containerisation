@@ -52,7 +52,7 @@ const HomePage: NextPage = () => {
       return;
     }
     setState((previous) => ({ ...previous, loading: true }));
-    const { data, error } = await tryCatch(getWork({ id }));
+    const { data, error } = await tryCatch(getWork(id));
     if (error) {
       alert(error.message);
       setState((previous) => ({ ...previous, loading: false }));

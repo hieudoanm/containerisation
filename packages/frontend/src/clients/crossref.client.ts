@@ -37,17 +37,20 @@ export const getId = (url: string): string | null => {
   }
 };
 
-export const getWork = async ({
-  id = '',
-  timeout = 60000,
-}: {
-  id: string;
-  timeout?: number;
-}): Promise<{ reference: Reference | null }> => {
-  const abortController = new AbortController();
-  const timer = setTimeout(() => abortController.abort(), timeout);
-  const url = `https://api.crossref.org/works/${id}`;
-  const proxyUrl = `https://hieudoanm-reverse-proxy.vercel.app/api?url=${url}`;
+export const getWork = async (
+  id: string,
+  {
+    timeoutMs = 60000,
+  }: {
+    timeoutMs?: number;
+  } = { timeoutMs: 60000 },
+): Promise<{ reference: Reference | null }> => {
+  const abortController: AbortController = new AbortController();
+  const timeout = setTimeout(() => abortController.abort(), timeoutMs);
+  const url: string = `https://api.crossref.org/works/${id}`;
+  const urlSearchParams: URLSearchParams = new URLSearchParams();
+  urlSearchParams.append('url', url);
+  const proxyUrl: string = `https://hieudoanm-reverse-proxy.vercel.app/api/?${urlSearchParams.toString()}`;
   console.info('proxyUrl', proxyUrl);
   const method: string = 'GET';
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
@@ -55,19 +58,19 @@ export const getWork = async ({
     fetch(proxyUrl, { method, headers, signal: abortController.signal }),
   );
   if (error) {
-    clearTimeout(timer);
+    clearTimeout(timeout);
     console.error('Error in generateContent:', error);
     return { reference: null };
   }
   if (!response?.ok) {
-    clearTimeout(timer);
+    clearTimeout(timeout);
     console.error(
       `Failed to generate content: ${response?.statusText ?? 'Unknown error'}`,
     );
     return { reference: null };
   }
   const data: CrossReferenceResponse = await response.json();
-  clearTimeout(timer);
+  clearTimeout(timeout);
   const { message } = data;
   const published = message['published-print'] ??
     message['published-online'] ?? { 'date-parts': [[]] };
