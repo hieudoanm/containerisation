@@ -52,7 +52,7 @@ export const getWork = async ({
   const method: string = 'GET';
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
   const { data: response, error } = await tryCatch(
-    fetch(url, { method, headers, signal: abortController.signal }),
+    fetch(proxyUrl, { method, headers, signal: abortController.signal }),
   );
   if (error) {
     clearTimeout(timer);
