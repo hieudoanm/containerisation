@@ -50,7 +50,7 @@ export const getWork = async (
   const url: string = `https://api.crossref.org/works/${id}`;
   const urlSearchParams: URLSearchParams = new URLSearchParams();
   urlSearchParams.append('url', url);
-  const proxyUrl: string = `https://hieudoanm-reverse-proxy.vercel.app/api/?${urlSearchParams.toString()}`;
+  const proxyUrl: string = `https://hieudoanm-proxy.vercel.app/api/?${urlSearchParams.toString()}`;
   console.info('proxyUrl', proxyUrl);
   const method: string = 'GET';
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
